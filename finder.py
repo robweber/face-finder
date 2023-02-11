@@ -38,11 +38,13 @@ parser = argparse.ArgumentParser(description='Face Finder')
 parser.add_argument('-k', '--known', default='known/', type=check_dir,
                     help='Directory of known faces to compare against')
 parser.add_argument("-i", "--input", type=check_exists, required=True,
-                        help="A single image, or a directory of images, to compare against")
+                    help="A single image, or a directory of images, to compare against")
+parser.add_argument("-n", "--name", type=str, default="Known face",
+                    help="The name of who you're looking for, for output")
 args = parser.parse_args()
 
 # load the known face images
-print(f"Loading known faces from '{args.known}'")
+print(f"Loading faces from '{args.known}'")
 
 known_face_encodings = []
 for file in os.listdir(args.known):
@@ -54,7 +56,7 @@ print(f"Found {len(known_face_encodings)} faces in known images")
 # test against unknown
 if(os.path.isfile(args.input)):
     if(compare_image(args.input, known_face_encodings)):
-        print(f"Known face found in '{os.path.join(root, f)}'")
+        print(f"{args.name} found in '{os.path.join(root, f)}'")
     else:
         print("No known faces found")
 else:
@@ -62,4 +64,4 @@ else:
         for f in files:
             if(is_image(f)):
                 if(compare_image(os.path.join(root, f), known_face_encodings)):
-                    print(f"Known face found in '{os.path.join(root, f)}'")
+                    print(f"{args.name} found in '{os.path.join(root, f)}'")
