@@ -38,7 +38,7 @@ python\python.exe finder.py -k known_images\ -i photos_dir\
 
 ### Advanced
 
-Information on advanced deepface settings
+The deepface library can use different facial recognition models and face detection backends. The default ones for this script are __Facenet512__ and __mtcnn__. This was based on my own experience playing around for accuracy. You can use the `-m` and `-d` arguments to specify different ones. Reading the [deepface docs](https://github.com/serengil/deepface) you can see which are better for speed vs accuracy. 
 
 ## Acknowledgements
 
