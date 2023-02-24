@@ -1,3 +1,4 @@
 *.jpg
+*.pkl
 python/*
 python3/*
