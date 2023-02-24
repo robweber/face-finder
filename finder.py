@@ -1,8 +1,8 @@
 import argparse
-import face_recognition
 import os
 import os.path
 import sys
+from deepface import DeepFace
 
 def check_dir(aDir):
     if(os.path.isdir(aDir)):
@@ -20,16 +20,20 @@ def is_image(aFile):
     _, ext = os.path.splitext(aFile)
     return ext.lower() in [".jpg", ".jpeg"] and not aFile.startswith('.')
 
-def compare_image(image_file, known_face_encodings):
+def compare_image(image_file, known_faces):
     result = False
-    test_image = face_recognition.load_image_file(image_file)
-    test_encoding = face_recognition.face_encodings(test_image)
+    #print(image_file)
+    if(os.path.exists(image_file)):
+        test_encoding = DeepFace.find(img_path = image_file, db_path = known_faces, model_name="Facenet512", detector_backend="mtcnn", silent=True, enforce_detection=False)
 
-    for e in test_encoding:
-        results = face_recognition.compare_faces(known_face_encodings, e)
-        if(results[0] == True):
-            result = True
-            break
+        for df in test_encoding:
+            distance = df.loc[:,"Facenet512_cosine"].min()
+            #print(distance)
+            if(distance < .20):
+                result = True
+                break
+    else:
+        print(f"skipping {image_file}")
 
     return result
 
@@ -46,22 +50,22 @@ args = parser.parse_args()
 # load the known face images
 print(f"Loading faces from '{args.known}'")
 
-known_face_encodings = []
-for file in os.listdir(args.known):
-    k_image = face_recognition.load_image_file(os.path.join(args.known, file))
-    known_face_encodings.append(face_recognition.face_encodings(k_image)[0])
-
-print(f"Found {len(known_face_encodings)} faces in known images")
+#print(f"Found {len(known_face_encodings)} faces in known images")
 
 # test against unknown
 if(os.path.isfile(args.input)):
-    if(compare_image(args.input, known_face_encodings)):
-        print(f"{args.name} found in '{os.path.join(root, f)}'")
+    if(compare_image(args.input, args.known)):
+        print(f"{args.name} found in '{os.path.join(args.input)}'")
     else:
         print("No known faces found")
 else:
+    found_images = []
     for root, dirs, files in os.walk(args.input):
         for f in files:
             if(is_image(f)):
-                if(compare_image(os.path.join(root, f), known_face_encodings)):
-                    print(f"{args.name} found in '{os.path.join(root, f)}'")
+                if(compare_image(os.path.join(root, f), args.known)):
+                    found_images.append(f"{args.name} found in '{os.path.join(root, f)}'")
+
+    print(f"Found {len(found_images)} images")
+    for i in found_images:
+        print(i)
