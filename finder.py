@@ -4,6 +4,7 @@ import os
 import os.path
 import sys
 from deepface import DeepFace
+from joblib import Parallel, delayed
 
 def check_dir(aDir):
     if(os.path.isdir(aDir)):
@@ -86,11 +87,12 @@ else:
                 search_images.append(os.path.join(root, f))
     logging.info(f"Found {len(search_images)} images to process")
 
+    processed_images = Parallel(n_jobs=3)(delayed(comparator.compare_image)(f, args.known) for f in search_images)
+
     found_images = []
-    for f in search_images:
-        result = comparator.compare_image(f, args.known)
-        if(result['result']):
-            found_images.append(f"{args.name} found in '{result['image']}'")
+    for i in processed_images:
+        if(i['result']):
+            found_images.append(f"{args.name} found in '{i['image']}'")
 
     logging.info(f"Found {len(found_images)} images")
     for i in found_images:
