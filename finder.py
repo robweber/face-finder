@@ -32,7 +32,7 @@ class ImageCompare:
     def compare_image(self, image_file, known_faces):
         result = {"image": image_file, "result": False}
 
-        if(os.path.exists(image_file) and is_image(image_file)):
+        if(os.path.exists(image_file)):
             test_encoding = DeepFace.find(img_path = image_file, db_path = known_faces, model_name=self.model, detector_backend=self.detector, silent=True, enforce_detection=False)
 
             for df in test_encoding:
@@ -79,12 +79,18 @@ if(os.path.isfile(args.input)):
     else:
         logging.info("No known faces found")
 else:
-    found_images = []
+    search_images = []
     for root, dirs, files in os.walk(args.input):
         for f in files:
-            result = comparator.compare_image(os.path.join(root, f), args.known)
-            if(result['result']):
-                found_images.append(f"{args.name} found in '{os.path.join(root, result['image'])}'")
+            if(is_image(f)):
+                search_images.append(os.path.join(root, f))
+    logging.info(f"Found {len(search_images)} images to process")
+
+    found_images = []
+    for f in search_images:
+        result = comparator.compare_image(f, args.known)
+        if(result['result']):
+            found_images.append(f"{args.name} found in '{result['image']}'")
 
     logging.info(f"Found {len(found_images)} images")
     for i in found_images:
