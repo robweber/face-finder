@@ -48,7 +48,7 @@ class ImageCompare:
 # parse the arguments
 parser = argparse.ArgumentParser(description='Face Finder')
 parser.add_argument('-k', '--known', default='known/', type=check_dir,
-                    help='Directory of known faces to compare against')
+                    help="Directory of known faces to compare against, default is '%(default)s'")
 parser.add_argument("-i", "--input", type=check_exists, required=True,
                     help="A single image, or a directory of images, to compare against")
 parser.add_argument("-n", "--name", type=str, default="Known face",
@@ -56,9 +56,9 @@ parser.add_argument("-n", "--name", type=str, default="Known face",
 parser.add_argument('-D', '--debug', action='store_true', help='If the program should run in debug mode')
 
 deepface_args = parser.add_argument_group("deepface options", "arguments for the deepface library")
-deepface_args.add_argument("-m", "--model", default="Facenet512", help="The face recognition model",
+deepface_args.add_argument("-m", "--model", default="Facenet512", help="The face recognition model, default is %(default)s",
                           choices=["VGG-Face", "Facenet", "Facenet512", "OpenFace", "DeepFace", "DeepID", "ArcFace", "Dlib", "SFace",])
-deepface_args.add_argument("-d", "--detector", default="mtcnn", help="The face detection backend",
+deepface_args.add_argument("-d", "--detector", default="mtcnn", help="The face detection backend, default is %(default)s",
                           choices=['opencv', 'ssd', 'dlib', 'mtcnn', 'retinaface', 'mediapipe'])
 args = parser.parse_args()
 
