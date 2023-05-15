@@ -3,6 +3,7 @@ import logging
 import os
 import os.path
 import sys
+import time
 from deepface import DeepFace
 from joblib import Parallel, delayed
 
@@ -54,6 +55,8 @@ parser.add_argument("-i", "--input", type=check_exists, required=True,
                     help="A single image, or a directory of images, to compare against")
 parser.add_argument("-n", "--name", type=str, default="Known face",
                     help="The name of who you're looking for, for output")
+parser.add_argument("-p", "--parallel", type=int, default=3,
+                    help="The number of image processing jobs to run at the same time, default is %(default)i")
 parser.add_argument('-D', '--debug', action='store_true', help='If the program should run in debug mode')
 
 deepface_args = parser.add_argument_group("deepface options", "arguments for the deepface library")
@@ -70,6 +73,7 @@ logging.basicConfig(datefmt='%m/%d %H:%M',
 logging.debug('Debug Mode On')
 
 # load the known face images
+start_time = time.perf_counter()
 logging.info(f"Loading faces from '{args.known}'")
 
 comparator = ImageCompare(args.model, args.detector)
@@ -87,7 +91,7 @@ else:
                 search_images.append(os.path.join(root, f))
     logging.info(f"Found {len(search_images)} images to process")
 
-    processed_images = Parallel(n_jobs=3)(delayed(comparator.compare_image)(f, args.known) for f in search_images)
+    processed_images = Parallel(n_jobs=args.parallel)(delayed(comparator.compare_image)(f, args.known) for f in search_images)
 
     found_images = []
     for i in processed_images:
@@ -97,3 +101,5 @@ else:
     logging.info(f"Found {len(found_images)} images")
     for i in found_images:
         logging.info(i)
+finish_time = time.perf_counter()
+print(f"Program ran in {finish_time-start_time} seconds")
