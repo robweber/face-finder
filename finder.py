@@ -30,15 +30,15 @@ class ImageCompare:
         self.detector = detector
 
     def compare_image(self, image_file, known_faces):
-        result = False
+        result = {"image": image_file, "result": False}
 
-        if(os.path.exists(image_file)):
+        if(os.path.exists(image_file) and is_image(image_file)):
             test_encoding = DeepFace.find(img_path = image_file, db_path = known_faces, model_name=self.model, detector_backend=self.detector, silent=True, enforce_detection=False)
 
             for df in test_encoding:
                 distance = df.loc[:,f"{self.model}_cosine"].min()
                 if(distance < .20):
-                    result = True
+                    result['result'] = True
                     break
         else:
             logging.debug(f"skipping {image_file}")
@@ -82,9 +82,9 @@ else:
     found_images = []
     for root, dirs, files in os.walk(args.input):
         for f in files:
-            if(is_image(f)):
-                if(comparator.compare_image(os.path.join(root, f), args.known)):
-                    found_images.append(f"{args.name} found in '{os.path.join(root, f)}'")
+            result = comparator.compare_image(os.path.join(root, f), args.known)
+            if(result['result']):
+                found_images.append(f"{args.name} found in '{os.path.join(root, result['image'])}'")
 
     logging.info(f"Found {len(found_images)} images")
     for i in found_images:
