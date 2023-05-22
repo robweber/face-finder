@@ -2,10 +2,13 @@ import argparse
 import logging
 import os
 import os.path
+import shutil
 import sys
 import time
 from deepface import DeepFace
 from joblib import Parallel, delayed
+
+COPY_DIR = "found"
 
 def check_dir(aDir):
     if(os.path.isdir(aDir)):
@@ -57,6 +60,7 @@ parser.add_argument("-n", "--name", type=str, default="Known face",
                     help="The name of who you're looking for, for output")
 parser.add_argument("-p", "--parallel", type=int, default=3,
                     help="The number of image processing jobs to run at the same time, default is %(default)i")
+parser.add_argument("-C", "--copy", action="store_true", help="copies found images to a directory")
 parser.add_argument('-D', '--debug', action='store_true', help='If the program should run in debug mode')
 
 deepface_args = parser.add_argument_group("deepface options", "arguments for the deepface library")
@@ -96,10 +100,20 @@ else:
     found_images = []
     for i in processed_images:
         if(i['result']):
-            found_images.append(f"{args.name} found in '{i['image']}'")
+            found_images.append(i['image'])
 
     logging.info(f"Found {len(found_images)} images")
     for i in found_images:
-        logging.info(i)
+        logging.info(f"{args.name} found in '{i}'")
 finish_time = time.perf_counter()
 print(f"Program ran in {finish_time-start_time} seconds")
+
+if(args.copy):
+    print(f"Copying found images to {COPY_DIR}")
+
+    # create directory if not there
+    if(not os.path.isdir(COPY_DIR)):
+        os.mkdir(COPY_DIR)
+
+    for f in found_images:
+        shutil.copy(f, os.path.join(COPY_DIR, os.path.basename(f)))
