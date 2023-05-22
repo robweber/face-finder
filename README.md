@@ -4,7 +4,7 @@ Combines the Python [deepface library](https://github.com/serengil/deepface) wit
 
 ## Install
 
-The target system here is Windows. If you want to run on other systems where Python is already installed simply clone the repo and install the dependencies. For Windows download [embedded Python](https://www.python.org/downloads/windows/) (tested on 3.10) and clone a copy of the respository. Extract the full embedded Python source code into the `face-finder` folder in a sub folder named `python`. You should have a folder structure that looks like the following:
+The target system here is Windows. If you want to run on other systems where Python is already installed simply clone the repo and install the dependencies. For Windows download [embedded Python](https://www.python.org/downloads/windows/) (tested on 3.10) and clone a copy of the repository. Extract the full embedded Python source code into the `face-finder` folder in a sub folder named `python`. You should have a folder structure that looks like the following:
 
 ```
 python/
@@ -38,7 +38,7 @@ python\python.exe finder.py -k known_images\ -i photos_dir\
 
 ### Advanced
 
-The deepface library can use different facial recognition models and face detection backends. The default ones for this script are __Facenet512__ and __mtcnn__. This was based on my own experience playing around for accuracy. You can use the `-m` and `-d` arguments to specify different ones. Reading the [deepface docs](https://github.com/serengil/deepface) you can see which are better for speed vs accuracy. 
+The deepface library can use different facial recognition models and face detection backends. The default ones for this script are __Facenet512__ and __mtcnn__. This was based on my own experience playing around for accuracy. You can use the `-m` and `-d` arguments to specify different ones. Reading the [deepface docs](https://github.com/serengil/deepface) you can see which are better for speed vs accuracy.
 
 ## Acknowledgements
 
